@@ -1,0 +1,102 @@
+---
+rule-providers:
+  RP-Direct:
+    type: file
+    behavior: classical
+    path: "./rule_provider/direct.yaml"
+  RP-Reject:
+    type: file
+    behavior: classical
+    path: "./rule_provider/reject.yaml"
+  RuleIndo:
+    type: file
+    behavior: classical
+    path: "./rule_provider/rule-indo.yaml"
+  RuleGaming:
+    type: file
+    behavior: classical
+    path: "./rule_provider/gaming.yaml"
+proxy-groups:
+- name: PRIMARY
+  type: url-test
+  disable-udp: false
+  use:
+  - AkunPrimary
+  url: http://cp.cloudflare.com/generate_204
+  interval: '300'
+  tolerance: '150'
+- name: INDO
+  type: select
+  disable-udp: false
+  use:
+  - AkunID
+dns:
+  nameserver:
+  - 192.168.8.1
+  - 192.168.9.1
+  - dhcp://"eth1"
+  - dhcp://"wwan0"
+  - https://dns.adguard.com/dns-query
+  - https://dns-google.com/dns-query
+  - tls://dns.adguard.com
+  - tls://dns-google.com/
+  enable: true
+  ipv6: false
+  enhanced-mode: redir-host
+  fake-ip-range: 198.18.0.1/16
+  listen: 127.0.0.1:7874
+  fake-ip-filter:
+  - "+.*"
+  default-nameserver:
+  - 192.168.9.1
+  - 192.168.8.1
+redir-port: 7892
+tproxy-port: 7895
+port: 7890
+socks-port: 7891
+mixed-port: 7893
+mode: rule
+log-level: silent
+allow-lan: true
+external-controller: 0.0.0.0:9090
+secret: reyre
+bind-address: "*"
+external-ui: "/usr/share/openclash/ui"
+ipv6: false
+tun:
+  enable: true
+  stack: system
+  auto-route: false
+  auto-detect-interface: false
+  dns-hijack:
+  - tcp://8.8.8.8:53
+  - tcp://8.8.4.4:53
+profile:
+  store-selected: true
+  store-fake-ip: true
+rules:
+- DST-PORT,7895,REJECT
+- DST-PORT,7892,REJECT
+- DST-PORT,7895,REJECT
+- DST-PORT,7892,REJECT
+- IP-CIDR,198.18.0.1/16,REJECT,no-resolve
+- RULE-SET,RP-Direct,DIRECT
+- RULE-SET,RP-Reject,REJECT
+- RULE-SET,RuleIndo,INDO
+- MATCH,GLOBAL
+tcp-concurrent: true
+proxy-providers:
+  AkunPrimary:
+    type: file
+    path: "./proxy_provider/sg.yaml"
+    health-check:
+      enable: false
+      url: http://cp.cloudflare.com/generate_204
+      interval: 300
+  AkunID:
+    type: file
+    path: "./proxy_provider/id.yaml"
+    health-check:
+      enable: true
+      url: http://www.gstatic.com/generate_204
+      interval: 300
