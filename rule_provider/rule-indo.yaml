@@ -1,9 +1,7 @@
 payload:
-# Mulai baris ini kebawah bisa di edit/hapus
-# &gt; LIST Streaming IP/Lokasi Wajib Indo
+# Rule buat website wajib ip indo
 # &gt; RCTI+
 - DOMAIN-SUFFIX,rctiplus.com
-
 # &gt; MOLA TV
 - DOMAIN-SUFFIX,mola.tv
 - DOMAIN-SUFFIX,ws.mola.tv
